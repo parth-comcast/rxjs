@@ -8,14 +8,15 @@ let source = Observable.create(observer => {
         observer.next(numbers[index++]);
 
         if (index < numbers.length) {
-            setTimeout(produceValue, 2000);
+            setTimeout(produceValue, 250);
         } else {
             observer.complete();
         }
     }
 
     produceValue();
-});
+}).map(value => value * 10)
+    .filter(value => value > 10);
 
 source.subscribe(
     value => console.log("This is Value:", value),
