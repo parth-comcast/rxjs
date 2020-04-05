@@ -1,21 +1,10 @@
-import { Observable, Observer } from 'rxjs';
+import { Observable } from 'rxjs';
 
 let numbers = [1, 10, 20, 30];
 let source = Observable.from(numbers);
 
-class MyObserver implements Observer<number> {
-    
-    next(value) {
-        console.log("This is Value:", value);
-    }
-
-    error(e) {
-        console.log("This is Error", e);
-    }
-    
-    complete() {
-        console.log("This is completion of observable!");
-    }    
-}
-
-source.subscribe(new MyObserver());
+source.subscribe(
+    value => console.log("This is Value:", value),
+    e => console.log("This is Error:", e),
+    () => console.log("This is completion of observable!")
+);
