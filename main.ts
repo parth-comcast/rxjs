@@ -3,17 +3,18 @@ import { Observable } from 'rxjs';
 let numbers = [1, 10, 20, 30];
 let source = Observable.create(observer => {
 
-    numbers.forEach(element => {
+    let index = 0;
+    let produceValue = () => {
+        observer.next(numbers[index++]);
 
-        // Try to print Error block of observable
-        if (element >= 5) {
-            observer.error("Element is Greater than expected!!!");
+        if (index < numbers.length) {
+            setTimeout(produceValue, 2000);
+        } else {
+            observer.complete();
         }
-        
-        observer.next(element);
-    })
+    }
 
-    observer.complete();
+    produceValue();
 });
 
 source.subscribe(
