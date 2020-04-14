@@ -39,6 +39,12 @@ function retryStrategy({attempts = 4, delay = 1000}) {
     }
 }
 
+function loadWithFetch(url: string) {
+    return Observable.defer(() => {
+        return Observable.fromPromise(fetch(url).then(r =>  r.json()));
+    });
+}
+
 function renderMovies(movies) {
     movies.forEach(movie => {
         let div = document.createElement("div");
@@ -47,7 +53,10 @@ function renderMovies(movies) {
     });
 }
 
-click.flatMap(data => load("movies.json"))
+load("movies.json");
+// subscribe(renderMovies);
+
+click.flatMap(data => loadWithFetch("movies.json"))
     .subscribe(
         data => renderMovies(data),
         e => console.log("This is Error:", e),
