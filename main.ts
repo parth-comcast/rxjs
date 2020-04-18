@@ -1,63 +1,45 @@
 import { Observable } from 'rxjs';
 
-let output = document.getElementById('output');
-let button = document.getElementById('button');
+import { load, loadWithFetch } from './loader';
 
-let click = Observable.fromEvent(button, "click");
 
-function load(url: string) {
+let source = Observable.create(observer => {
 
-    return Observable.create(observer => {
-        let xhr = new XMLHttpRequest();
+    observer.next(1);
+    observer.next(2);
+    observer.error("Something stop!!");
+    observer.complete();
+});
 
-        xhr.addEventListener("load", () => {
-            if (xhr.status === 200) {
-                let data = JSON.parse(xhr.response);
-                observer.next(data);
-                observer.complete();
-            } else {
-                observer.error(xhr.statusText);
-            }
-        });
 
-        xhr.open('GET', url);
-        xhr.send();
-    // take an observabel and return an observable
-    }).retryWhen(retryStrategy({ attempts: 3, delay: 1500 }));
-}
+source.subscribe(
+    value => console.log("Value :", value),
+    error => console.log("Error !", error),
+    () => console.log("Complete observable!"),
+);
 
-function retryStrategy({attempts = 4, delay = 1000}) {
-    return function(error) {
-        return error
-            .scan((acc, value) => {
-                console.log(acc, value);
-                return acc + 1;
-            }, 1)
-            // stop observable!!
-            .takeWhile((acc) => acc < attempts )
-            .delay(delay);
-    }
-}
 
-function loadWithFetch(url: string) {
-    return Observable.defer(() => {
-        return Observable.fromPromise(fetch(url).then(r =>  r.json()));
-    });
-}
 
-function renderMovies(movies) {
-    movies.forEach(movie => {
-        let div = document.createElement("div");
-        div.innerText = movie.title;
-        output.appendChild(div);
-    });
-}
+// let output = document.getElementById('output');
+// let button = document.getElementById('button');
 
-load("movies.json");
-// subscribe(renderMovies);
+// let click = Observable.fromEvent(button, "click");
 
-click.flatMap(data => loadWithFetch("movies.json"))
-    .subscribe(
-        data => renderMovies(data),
-        e => console.log("This is Error:", e),
-        () => console.log("This is completion of observable!"));
+
+
+// function renderMovies(movies) {
+//     movies.forEach(movie => {
+//         let div = document.createElement("div");
+//         div.innerText = movie.title;
+//         output.appendChild(div);
+//     });
+// }
+
+// load("movies.json");
+// // subscribe(renderMovies);
+
+// click.flatMap(data => loadWithFetch("movies.json"))
+//     .subscribe(
+//         data => renderMovies(data),
+//         e => console.log("This is Error:", e),
+//         () => console.log("This is completion of observable!"));
