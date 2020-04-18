@@ -1,15 +1,15 @@
 import { Observable } from 'rxjs';
 
-import { load, loadWithFetch } from './loader';
+// import { load, loadWithFetch } from './loader';
 
 
-let source = Observable.create(observer => {
+let source = Observable.onErrorResumeNext(
+    Observable.of(1),
+    Observable.from([2,3,4]),
+    Observable.throw(new Error("Caution Stop!!")),
+    Observable.of(5),
+);
 
-    observer.next(1);
-    observer.next(2);
-    observer.error("Something stop!!");
-    observer.complete();
-});
 
 
 source.subscribe(
@@ -18,7 +18,13 @@ source.subscribe(
     () => console.log("Complete observable!"),
 );
 
+// let source = Observable.create(observer => {
 
+//     observer.next(1);
+//     observer.next(2);
+//     observer.error("Something stop!!");
+//     observer.complete();
+// });
 
 // let output = document.getElementById('output');
 // let button = document.getElementById('button');
