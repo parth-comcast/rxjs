@@ -21,7 +21,7 @@ export function load(url: string) {
     }).retryWhen(retryStrategy({ attempts: 3, delay: 1500 }));
 }
 
-export function retryStrategy({attempts = 4, delay = 1000}) {
+export function retryStrategy({attempts = 4, delay = 1000} = {}) {
     return function(error) {
         return error
             .scan((acc, value) => {
@@ -36,6 +36,12 @@ export function retryStrategy({attempts = 4, delay = 1000}) {
 
 export function loadWithFetch(url: string) {
     return Observable.defer(() => {
-        return Observable.fromPromise(fetch(url).then(r =>  r.json()));
-    });
+        return Observable.fromPromise(fetch(url).then(r => {
+            if (r.status === 200) {
+                return r.json();
+            } else {
+                Promise.reject(r);
+            }
+        }))
+    }).retryWhen(retryStrategy());
 }
